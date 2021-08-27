@@ -8,7 +8,7 @@ java -jar NodeExtensionSetup.jar -e {extensionScript} -v {minimalPythonVersion} 
 ```
 Example:
 ```cmd
-java -jar NodeExtensionSetup.jar -e myExtension.js -v 3.2.0 -c {cookie} -p {port} -f {filename}
+java -jar NodeExtensionSetup.jar -e myExtension.js -v 15.0.0 -c {cookie} -p {port} -f {filename}
 ```
 How to note in extension.json:
 ```json
