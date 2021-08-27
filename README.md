@@ -13,7 +13,7 @@ java -jar NodeExtensionSetup.jar -e myExtension.js -v 3.2.0 -c {cookie} -p {port
 How to note in extension.json:
 ```json
 "commands": {
-  "default": ["java", "-jar", "NodeExtensionSetup.jar", "-e", "myExtension.js", "-v", "3.2.0", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}"]
+  "default": ["java", "-jar", "NodeExtensionSetup.jar", "-e", "myExtension.js", "-v", "15.0.0", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}"]
 }
 ```
 
