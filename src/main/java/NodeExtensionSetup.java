@@ -1,4 +1,3 @@
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
@@ -8,12 +7,12 @@ import javafx.scene.control.ButtonType;
 
 import java.io.*;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,16 +56,16 @@ public class NodeExtensionSetup {
             clearCache();
         } catch (Exception e) {
             new JFXPanel(); // Create JavaFX thread
-            new File("error.txt");
-            FileOutputStream fos = new FileOutputStream(new File("error.txt"));
             Platform.runLater(() -> {
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setTitle("Error while setting up Node.js extension!");
-                error.setHeaderText("Error in setup of " + new File(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile().getName());
-                e.printStackTrace(new PrintStream(fos));
-                error.setContentText(e.getMessage());
-                error.showAndWait();
                 try {
+                    new File("error.txt");
+                    FileOutputStream fos = new FileOutputStream(new File("error.txt"));
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setTitle("Error while setting up Node.js extension!");
+                    error.setHeaderText("Error in setup of " + new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile().getParentFile().getName());
+                    e.printStackTrace(new PrintStream(fos));
+                    error.setContentText(e.getMessage());
+                    error.showAndWait();
                     fos.close();
                 } catch (IOException ignored) {};
             });
@@ -150,7 +149,7 @@ public class NodeExtensionSetup {
             String downloadUrl = String.format("https://nodejs.org/dist/v%s/node-v%s-x64.msi", minVersion, minVersion);
             File installerExe = downloadCacheFile(new URL(downloadUrl), "nodeInstaller.msi");
             ProcessBuilder pb = new ProcessBuilder("msiexec", "/i", installerExe.toString(), "/quiet", "/norestart");
-            pb.directory(new File(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile());
+            pb.directory(new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile());
             Process p = pb.start();
             p.waitFor();
         } catch (IOException e) {
@@ -163,7 +162,7 @@ public class NodeExtensionSetup {
         // Too complicated to include all distributions
         try {
             if(!requestContinueApproval("Install/Update Node.js",
-                    new File(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getName() + " requires Python to be installed/updated!",
+                    new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile().getName() + " requires Python to be installed/updated!",
                     String.format("Use your local package manager to update Node.js to a version of %s or higher, afterwards click OK\n(If you click OK before installing/updating, the extension will not run this time)", minVersion))){
                 throw new Exception("Setup cancelled, extension will most likely not launch!");
             }
@@ -182,7 +181,7 @@ public class NodeExtensionSetup {
             String downloadUrl = String.format("https://nodejs.org/dist/v%s/node-v%s.pkg", minVersion, minVersion);
             File installerPkg = downloadCacheFile(new URL(downloadUrl), "nodeInstaller.pkg");
             ProcessBuilder pb = new ProcessBuilder("installer", "-pkg", installerPkg.toString(), "-target", "CurrenUserHomeDirectory");
-            pb.directory(new File(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile());
+            pb.directory(new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile());
             Process p = pb.start();
             p.waitFor();
         } catch (IOException e) {
@@ -232,7 +231,7 @@ public class NodeExtensionSetup {
             File req = new File("package.json");
             if (req.exists()) {
                 ProcessBuilder pb = new ProcessBuilder("npm" + (System.getProperty("os.name").toLowerCase().contains("win") ? ".cmd" : ""), "install");
-                pb.directory(new File(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile());
+                pb.directory(new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile());
                 Process p = pb.start();
                 p.waitFor();
             }
@@ -253,7 +252,7 @@ public class NodeExtensionSetup {
         if(cookie != null) command.addAll(Arrays.asList("-c", cookie));
 
         ProcessBuilder pb = new ProcessBuilder(command);
-        pb.directory(new File(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile());
+        pb.directory(new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile());
         pb.start();
     }
 }
