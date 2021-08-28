@@ -22,6 +22,7 @@ public class NodeExtensionSetup {
     private static final String[] FILE_FLAG = {"--filename", "-f"};
     private static final String[] COOKIE_FLAG = {"--auth-token", "-c"};
     private static final String[] MIN_VERSION_FLAG = {"--min-version", "-v"};
+    private static final String[] NPM_RUN_FLAG = {"--npm-run", "-npm"};
     private static final String[] EXTENSION_FLAG = {"--extension", "-e"};
 
     public static void main(String[] args) throws IOException {
@@ -42,7 +43,8 @@ public class NodeExtensionSetup {
     private static void runSetup(String[] args) throws IOException {
         try {
             String extensionScript = getArgument(args, EXTENSION_FLAG);
-            if (extensionScript == null) throw new Exception("Node.js extension file must be defined in the run args (-e script.js)");
+            String npmRun = getArgument(args, NPM_RUN_FLAG);
+            if (extensionScript == null && npmRun == null) throw new Exception("Node.js extension file or npm run must be defined in the run args (-e script.js OR -npm start)");
             String minVersion = getArgument(args, MIN_VERSION_FLAG);
             if (minVersion == null) throw new Exception("Minimum Node.js version has to be defined in the run args (-v 15.0.0)");
             String port = getArgument(args, PORT_FLAG);
@@ -162,7 +164,7 @@ public class NodeExtensionSetup {
         // Too complicated to include all distributions
         try {
             if(!requestContinueApproval("Install/Update Node.js",
-                    new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile().getName() + " requires Python to be installed/updated!",
+                    new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile().getParentFile().getName() + " requires Python to be installed/updated!",
                     String.format("Use your local package manager to update Node.js to a version of %s or higher, afterwards click OK\n(If you click OK before installing/updating, the extension will not run this time)", minVersion))){
                 throw new Exception("Setup cancelled, extension will most likely not launch!");
             }
@@ -242,12 +244,18 @@ public class NodeExtensionSetup {
     }
 
     private static void runExtension(String[] args) throws Exception {
-        String extensionScript = getArgument(args, EXTENSION_FLAG);
+        String npmRun = getArgument(args, NPM_RUN_FLAG);
         String cookie = getArgument(args, COOKIE_FLAG);
         String file = getArgument(args, FILE_FLAG);
         String port = getArgument(args, PORT_FLAG);
+        ArrayList<String> command;
+        if(npmRun != null) {
+            command = new ArrayList<>(Arrays.asList("npm" + (System.getProperty("os.name").toLowerCase().contains("win") ? ".cmd" : ""), "run", npmRun, "--", "--", "--", "--",  "-p", port));
+        } else {
+            String extensionScript = getArgument(args, EXTENSION_FLAG);
+            command = new ArrayList<>(Arrays.asList("node.exe", extensionScript, "-p", port));
+        }
 
-        ArrayList<String> command = new ArrayList<>(Arrays.asList("node.exe", extensionScript, "-p", port));
         if(file != null) command.addAll(Arrays.asList("-f", file));
         if(cookie != null) command.addAll(Arrays.asList("-c", cookie));
 
