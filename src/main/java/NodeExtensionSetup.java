@@ -182,7 +182,7 @@ public class NodeExtensionSetup {
         try {
             String downloadUrl = String.format("https://nodejs.org/dist/v%s/node-v%s.pkg", minVersion, minVersion);
             File installerPkg = downloadCacheFile(new URL(downloadUrl), "nodeInstaller.pkg");
-            ProcessBuilder pb = new ProcessBuilder("installer", "-pkg", installerPkg.toString(), "-target", "CurrenUserHomeDirectory");
+            ProcessBuilder pb = new ProcessBuilder("installer", "-pkg", installerPkg.toString(), "-target", "CurrentUserHomeDirectory");
             pb.directory(new File(URLDecoder.decode(NodeExtensionSetup.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF8")).getParentFile());
             Process p = pb.start();
             p.waitFor();
@@ -253,7 +253,7 @@ public class NodeExtensionSetup {
             command = new ArrayList<>(Arrays.asList("npm" + (System.getProperty("os.name").toLowerCase().contains("win") ? ".cmd" : ""), "run", npmRun, "--", "--", "--", "--",  "-p", port));
         } else {
             String extensionScript = getArgument(args, EXTENSION_FLAG);
-            command = new ArrayList<>(Arrays.asList("node.exe", extensionScript, "-p", port));
+            command = new ArrayList<>(Arrays.asList("node" + (System.getProperty("os.name").toLowerCase().contains("win") ? ".exe" : ""), extensionScript, "-p", port));
         }
 
         if(file != null) command.addAll(Arrays.asList("-f", file));
